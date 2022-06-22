@@ -1,4 +1,4 @@
-# Intro
+
 # 💫 About Me:
 🔭 I’m currently working on my Data Science Skills <br>🌱 I’m currently learning to make interactive data report<br>💬 Ask me about any tech-related stuff.<br>📫 How to reach me: Email - maxime.lhuillier@estp.fr<br>😄 Pronouns: He/His<br>⚡ Fun fact: U don't wanna be my neighbor i play guitar at 3am
 
