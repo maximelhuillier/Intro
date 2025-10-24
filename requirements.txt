@@ -7,5 +7,8 @@ extract-msg>=0.45.0
 # Alternative pour .msg si extract-msg ne fonctionne pas
 # msg-extractor>=0.11.0
 
+# Export Excel
+openpyxl>=3.1.0
+
 # Pas de dépendances lourdes nécessaires pour les fonctionnalités de base !
 # Les graphiques utilisent Chart.js côté client (pas besoin de matplotlib, plotly, etc.)

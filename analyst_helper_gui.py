@@ -299,9 +299,10 @@ class AnalystHelperGUI:
             self.log(f"   Taille totale : {scanner.stats['total_size_mb']:.2f} MB")
             self.log(f"   Emails : {scanner.stats['total_emails']}")
 
-            # Export CSV/JSON
+            # Export CSV/JSON/Excel
             scanner.export_to_csv(str(output_dir / "fichiers.csv"))
             scanner.export_to_json(str(output_dir / "fichiers.json"))
+            scanner.export_to_excel(str(output_dir / "fichiers.xlsx"))
 
             # Étape 2 : Classification
             if self.do_classify.get():

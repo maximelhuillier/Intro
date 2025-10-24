@@ -233,6 +233,138 @@ class FolderScanner:
 
         print(f"📊 Export CSV: {output_path}")
 
+    def export_to_excel(self, output_path: str):
+        """
+        Exporte les résultats en Excel (.xlsx)
+
+        Args:
+            output_path: Chemin du fichier de sortie
+        """
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+            from openpyxl.utils import get_column_letter
+        except ImportError:
+            print("⚠️  Module 'openpyxl' non installé")
+            print("   Installation : pip install openpyxl")
+            return
+
+        if not self.files:
+            print("⚠️  Aucun fichier à exporter")
+            return
+
+        # Créer le workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Liste des fichiers"
+
+        # En-têtes
+        headers = [
+            "Type", "Nom", "Extension", "Taille (KB)", "Taille (MB)",
+            "Date création", "Date modification", "Dossier parent", "Chemin complet"
+        ]
+
+        # Style des en-têtes
+        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF", size=11)
+        border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+
+        # Écrire les en-têtes
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.border = border
+
+        # Écrire les données
+        for row, file in enumerate(self.files, 2):
+            ws.cell(row=row, column=1, value=file.file_type)
+            ws.cell(row=row, column=2, value=file.name)
+            ws.cell(row=row, column=3, value=file.extension)
+            ws.cell(row=row, column=4, value=file.size_kb)
+            ws.cell(row=row, column=5, value=file.size_mb)
+            ws.cell(row=row, column=6, value=file.created_date)
+            ws.cell(row=row, column=7, value=file.modified_date)
+            ws.cell(row=row, column=8, value=file.parent_folder)
+            ws.cell(row=row, column=9, value=file.path)
+
+            # Bordures pour toutes les cellules
+            for col in range(1, 10):
+                ws.cell(row=row, column=col).border = border
+
+        # Ajuster la largeur des colonnes
+        column_widths = {
+            'A': 20,  # Type
+            'B': 40,  # Nom
+            'C': 12,  # Extension
+            'D': 12,  # Taille KB
+            'E': 12,  # Taille MB
+            'F': 20,  # Date création
+            'G': 20,  # Date modification
+            'H': 25,  # Dossier parent
+            'I': 60   # Chemin complet
+        }
+
+        for col, width in column_widths.items():
+            ws.column_dimensions[col].width = width
+
+        # Figer la première ligne
+        ws.freeze_panes = 'A2'
+
+        # Ajouter une feuille de statistiques
+        ws_stats = wb.create_sheet("Statistiques")
+
+        stats_data = [
+            ["📊 Statistiques d'analyse", ""],
+            ["", ""],
+            ["Dossier analysé:", str(self.root_path)],
+            ["Date d'analyse:", datetime.now().strftime('%d/%m/%Y %H:%M:%S')],
+            ["", ""],
+            ["Nombre total de fichiers:", self.stats['total_files']],
+            ["Taille totale (MB):", f"{self.stats['total_size_mb']:.2f}"],
+            ["Nombre d'emails:", self.stats['total_emails']],
+            ["Nombre de dossiers:", self.stats['total_folders']],
+            ["", ""],
+            ["Répartition par type:", ""],
+        ]
+
+        for file_type, count in self.stats['by_type'].items():
+            stats_data.append([f"  {file_type}:", count])
+
+        stats_data.append(["", ""])
+        stats_data.append(["Top 10 extensions:", ""])
+
+        top_extensions = sorted(
+            self.stats['by_extension'].items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:10]
+
+        for ext, count in top_extensions:
+            stats_data.append([f"  {ext}:", count])
+
+        # Écrire les stats
+        for row_idx, (label, value) in enumerate(stats_data, 1):
+            ws_stats.cell(row=row_idx, column=1, value=label)
+            ws_stats.cell(row=row_idx, column=2, value=value)
+
+            # Style du titre
+            if row_idx == 1:
+                ws_stats.cell(row=row_idx, column=1).font = Font(bold=True, size=14, color="4472C4")
+
+        ws_stats.column_dimensions['A'].width = 30
+        ws_stats.column_dimensions['B'].width = 20
+
+        # Sauvegarder
+        wb.save(output_path)
+        print(f"📗 Export Excel: {output_path}")
+
     def get_tree_structure(self, max_depth: int = 3) -> str:
         """
         Génère une représentation textuelle de l'arborescence
