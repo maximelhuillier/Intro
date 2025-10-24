@@ -1,0 +1,15 @@
+# AnalystHelper - Dépendances de Développement
+# Pour créer l'exécutable Windows
+
+# Dépendances de base
+-r requirements.txt
+
+# Pour créer des exécutables
+pyinstaller>=5.13.0
+
+# Pour les tests
+pytest>=7.4.0
+
+# Pour le formatage du code
+black>=23.0.0
+flake8>=6.0.0
