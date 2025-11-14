@@ -78,12 +78,12 @@ class FolderScanner:
         if exclude_folders is None:
             exclude_folders = []
 
-        print(f"🔍 Scan de: {self.root_path}")
+        print(f"[SCAN] Scan de: {self.root_path}")
         self.files = []
         self._scan_directory(self.root_path, 0, exclude_folders)
         self._compute_stats()
 
-        print(f"✅ Scan terminé: {self.stats['total_files']} fichiers trouvés")
+        print(f"[OK] Scan termine: {self.stats['total_files']} fichiers trouves")
         return self.files
 
     def _scan_directory(self, directory: Path, depth: int, exclude_folders: List[str]):
@@ -96,7 +96,7 @@ class FolderScanner:
             exclude_folders: Dossiers à exclure
         """
         if depth > self.max_depth:
-            print(f"⚠️  Profondeur maximale atteinte pour: {directory}")
+            print(f"[WARN] Profondeur maximale atteinte pour: {directory}")
             return
 
         try:
@@ -115,9 +115,9 @@ class FolderScanner:
                     self._scan_directory(Path(entry.path), depth + 1, exclude_folders)
 
         except PermissionError:
-            print(f"⚠️  Accès refusé: {directory}")
+            print(f"[WARN] Acces refuse: {directory}")
         except Exception as e:
-            print(f"❌ Erreur lors du scan de {directory}: {e}")
+            print(f"[ERROR] Erreur lors du scan de {directory}: {e}")
 
     def _create_file_info(self, entry: os.DirEntry, depth: int) -> Optional[FileInfo]:
         """
@@ -156,7 +156,7 @@ class FolderScanner:
             )
 
         except Exception as e:
-            print(f"⚠️  Erreur lecture fichier {entry.name}: {e}")
+            print(f"[WARN] Erreur lecture fichier {entry.name}: {e}")
             return None
 
     def _classify_file(self, extension: str) -> str:
@@ -210,7 +210,7 @@ class FolderScanner:
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-        print(f"📄 Export JSON: {output_path}")
+        print(f"[INFO] Export JSON: {output_path}")
 
     def export_to_csv(self, output_path: str):
         """
@@ -222,7 +222,7 @@ class FolderScanner:
         import csv
 
         if not self.files:
-            print("⚠️  Aucun fichier à exporter")
+            print("[WARN] Aucun fichier a exporter")
             return
 
         with open(output_path, 'w', newline='', encoding='utf-8-sig') as f:
@@ -231,7 +231,7 @@ class FolderScanner:
             for file in self.files:
                 writer.writerow(file.to_dict())
 
-        print(f"📊 Export CSV: {output_path}")
+        print(f"[INFO] Export CSV: {output_path}")
 
     def export_to_excel(self, output_path: str):
         """
@@ -245,12 +245,12 @@ class FolderScanner:
             from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
             from openpyxl.utils import get_column_letter
         except ImportError:
-            print("⚠️  Module 'openpyxl' non installé")
+            print("[WARN] Module 'openpyxl' non installe")
             print("   Installation : pip install openpyxl")
             return
 
         if not self.files:
-            print("⚠️  Aucun fichier à exporter")
+            print("[WARN] Aucun fichier a exporter")
             return
 
         # Créer le workbook
@@ -363,7 +363,7 @@ class FolderScanner:
 
         # Sauvegarder
         wb.save(output_path)
-        print(f"📗 Export Excel: {output_path}")
+        print(f"[INFO] Export Excel: {output_path}")
 
     def get_tree_structure(self, max_depth: int = 3) -> str:
         """

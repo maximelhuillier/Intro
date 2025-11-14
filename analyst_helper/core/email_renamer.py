@@ -168,20 +168,21 @@ class EmailRenamer:
         """
         Construit le nom de fichier
 
-        Format: YYYYMMDD_Expéditeur_Destinataire_Objet.msg
+        Format: YYYYMMDD_Expéditeur @ Destinataire_Objet.msg
         """
         sender_clean = self.clean_string(sender, 30)
         recipient_clean = self.clean_string(recipient, 30)
         subject_clean = self.clean_string(subject, 50)
 
-        filename = f"{date}_{sender_clean}_{recipient_clean}_{subject_clean}.msg"
+        # Format avec @ au lieu de _
+        filename = f"{date}_{sender_clean} @ {recipient_clean}_{subject_clean}.msg"
 
         # Sécurité : limiter à 255 caractères (limite Windows)
         if len(filename) > 255:
             # Réduire l'objet
-            max_subject = 255 - len(f"{date}_{sender_clean}_{recipient_clean}_.msg")
+            max_subject = 255 - len(f"{date}_{sender_clean} @ {recipient_clean}_.msg")
             subject_clean = subject_clean[:max_subject]
-            filename = f"{date}_{sender_clean}_{recipient_clean}_{subject_clean}.msg"
+            filename = f"{date}_{sender_clean} @ {recipient_clean}_{subject_clean}.msg"
 
         return filename
 
